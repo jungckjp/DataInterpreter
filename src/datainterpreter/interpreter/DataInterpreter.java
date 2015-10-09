@@ -3,7 +3,6 @@ package datainterpreter.interpreter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.json.simple.parser.ParseException;
