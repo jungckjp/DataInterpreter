@@ -27,6 +27,10 @@ public class DataTests {
 	Date date;
 	Date date2;
 
+	/*
+	 * I realize a large portion of this data here is deprecated, but it works
+	 * for testing purposes.
+	 */
 	@SuppressWarnings("deprecation")
 	@Before
 	public void setUp() throws Exception {

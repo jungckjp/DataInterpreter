@@ -25,10 +25,8 @@ public class Task {
 	public Map<String, Map<String, Object>> variables;
 	public String processName;
 	public String id;
-	public boolean initialized;
-	
-	
+
+	// This Task class is just a data object. It stores variables for searches.
 	public Task() {
-		this.initialized = false;
 	}
 }

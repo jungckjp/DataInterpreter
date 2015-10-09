@@ -34,6 +34,7 @@ public class Parser {
 
 		ArrayList<Task> tasks = new ArrayList<Task>();
 
+		// Parse through all the JSON and populate an ArrayList of Tasks.
 		for (Object e : entries) {
 			try {
 				JSONObject data = (JSONObject) e;
@@ -65,7 +66,6 @@ public class Parser {
 					tasksByInstanceId.put(task.instanceId, newTasks);
 				}
 
-				task.initialized = true;
 				tasks.add(task);
 			} catch (NullPointerException ex) {
 				ex.printStackTrace();
@@ -74,6 +74,11 @@ public class Parser {
 		return tasks;
 	}
 
+	/*
+	 * Since the InstanceID seems to be used regularly, I made a map so it can
+	 * be accessed quicker and you don't have to iterate all the data every
+	 * time.
+	 */
 	public Map<Long, ArrayList<Task>> getTasksByInstanceId() {
 		return this.tasksByInstanceId;
 	}
