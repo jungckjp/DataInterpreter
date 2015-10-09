@@ -4,40 +4,40 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import org.json.simple.parser.ParseException;
 
 import datainterpreter.model.Task;
 
+/**
+ * Data Interpreter which does the main work for comparing data.
+ * 
+ * NOTE: Please note that I chose to make these methods directly output a user
+ * friendly message. If needed, I would happily change it to a format where it
+ * just returned raw data (ints, ArrayList<Task>, etc).
+ * 
+ * @author jonathan
+ *
+ */
 public class DataInterpreter {
-	public static ArrayList<Task> tasks;
+	public ArrayList<Task> tasks;
+	public Map<Long, ArrayList<Task>> tasksByInstanceId;
 
-	@SuppressWarnings("deprecation")
-	public static void main(String[] args)
-			throws ParseException, FileNotFoundException, IOException, java.text.ParseException {
+	public DataInterpreter() throws FileNotFoundException, IOException, ParseException, java.text.ParseException {
 		String fileName = "data/task-3.json";
 		Parser parser = new Parser();
 		tasks = parser.parse(fileName);
-		Date date = new Date();
-		date.setYear(115);
-		date.setMonth(1);
-		date.setDate(23);
-		date.setMinutes(0);
-		date.setHours(0);
-		date.setSeconds(0);
-		Date date2 = new Date();
-		date2.setMonth(1);
-		date2.setYear(115);
-		date2.setDate(24);
-		System.out.println(tasksUpToDate(date));
-		System.out.println(tasksInDateRange(date, date2));
-		System.out.println(getMostRecentTaskName(553));
-		System.out.println(getInstanceIdCount(493));
-		System.out.println(getAssigneeTasks("Impact 2014"));
-		System.out.println(getAssigneeTasks("dbailie"));
+		tasksByInstanceId = parser.getTasksByInstanceId();
 	}
 
-	public static String tasksInDateRange(Date date1, Date date2) {
+	public String tasksInDateRange(Date date1, Date date2) {
+		if (!(date1 != null && date2 != null)) {
+			return "Incorect date format!";
+		}
+		if (date2.before(date1)) {
+			return "The first date must be before the second date!";
+		}
 		int closed = 0;
 		int open = 0;
 		for (Task t : tasks) {
@@ -53,7 +53,10 @@ public class DataInterpreter {
 		return "Task changes between " + date1 + " and " + date2 + " - Open: " + open + ", Closed: " + closed;
 	}
 
-	public static String tasksUpToDate(Date date) {
+	public String tasksUpToDate(Date date) {
+		if (!(date != null)) {
+			return "Incorrect date format!";
+		}
 		int closed = 0;
 		int open = 0;
 		for (Task t : tasks) {
@@ -66,44 +69,50 @@ public class DataInterpreter {
 		return "Task changes up to " + date + " - Open: " + open + ", Closed: " + closed;
 
 	}
-	
-	public static String getMostRecentTaskName(long instance) {
-		Task mostRecentTask = new Task();
-		for (Task t : tasks) {
-			if (t.instanceId == instance) {
-				if (!mostRecentTask.initialized) {
-					mostRecentTask = t;
-					mostRecentTask.initialized = true;
-				}
+
+	public String getMostRecentTaskName(long instance) {
+		ArrayList<Task> tasks;
+		if ((tasks = tasksByInstanceId.get(instance)) != null) {
+			Task mostRecentTask = tasks.get(0);
+			for (Task t : tasks) {
 				if (t.createDate.after(mostRecentTask.createDate)) {
 					mostRecentTask = t;
 				}
 			}
+			return "Most recent task name for Instance ID " + instance + ": " + mostRecentTask.name;
+		} else {
+			return "There are no tasks with that instance ID.";
 		}
-		return "Most recent task name for Instance ID " + instance + ": " + mostRecentTask.name;
+
 	}
-	
-	public static String getInstanceIdCount(long instance) {
-		int count = 0;
-		for (Task t : tasks) {
-			if (t.instanceId == instance) {
-				count++;
-			}
+
+	public String getInstanceIdCount(long instance) {
+		ArrayList<Task> tasks;
+		if ((tasks = tasksByInstanceId.get(instance)) != null) {
+			int count = tasks.size();
+			return "There are " + count + " tasks with Instance ID " + instance;
+		} else {
+			return "There are no tasks with that instance ID.";
 		}
-		return "There are " + count + " tasks with Instance ID " + instance;
 	}
-	
-	public static String getAssigneeTasks(String assignee) {
+
+	public String getAssigneeTasks(String assignee) {
+		if (!(assignee != null)) {
+			return "There are no tasks for that assignee.";
+		}
 		int closed = 0;
 		int open = 0;
 		for (Task t : tasks) {
 			if (t.assignee.equals(assignee)) {
 				if (t.closeDate != null) {
-					closed ++;
+					closed++;
 				} else {
 					open++;
 				}
 			}
+		}
+		if (closed == 0 && open == 0) {
+			return "There are no tasks for that assignee.";
 		}
 		return "Tasks for " + assignee + " - Open: " + open + ", Closed: " + closed;
 

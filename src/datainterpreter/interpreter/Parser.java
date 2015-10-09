@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.*;
@@ -16,15 +17,18 @@ import datainterpreter.model.Task;
 
 /**
  * This class parses the data from the JSON into the data objects used to track
- * information for BP3 based on a set of data. Heavy use of the org.json package
- * exists here.
+ * information for BP3 based on a set of data. Heavy use of the org.json.simple
+ * package exists here.
  * 
  * @author jonathan
  */
 public class Parser {
 
+	private Map<Long, ArrayList<Task>> tasksByInstanceId = new HashMap<Long, ArrayList<Task>>();
+
 	@SuppressWarnings("unchecked")
-	public ArrayList<Task> parse(String fileName) throws FileNotFoundException, IOException, ParseException, java.text.ParseException {
+	public ArrayList<Task> parse(String fileName)
+			throws FileNotFoundException, IOException, ParseException, java.text.ParseException {
 		JSONParser parser = new JSONParser();
 		JSONArray entries = (JSONArray) parser.parse(new InputStreamReader(new FileInputStream(fileName)));
 
@@ -52,7 +56,15 @@ public class Parser {
 				task.variables = (Map<String, Map<String, Object>>) data.get("variables");
 				task.processName = (String) data.get("processName");
 				task.id = (String) data.get("id");
-				
+
+				if (tasksByInstanceId.containsKey(task.instanceId)) {
+					tasksByInstanceId.get(task.instanceId).add(task);
+				} else {
+					ArrayList<Task> newTasks = new ArrayList<Task>();
+					newTasks.add(task);
+					tasksByInstanceId.put(task.instanceId, newTasks);
+				}
+
 				task.initialized = true;
 				tasks.add(task);
 			} catch (NullPointerException ex) {
@@ -60,6 +72,10 @@ public class Parser {
 			}
 		}
 		return tasks;
+	}
+
+	public Map<Long, ArrayList<Task>> getTasksByInstanceId() {
+		return this.tasksByInstanceId;
 	}
 
 }

@@ -3,6 +3,12 @@ package datainterpreter.model;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Data model object for tasks.
+ * 
+ * @author jonathan
+ *
+ */
 public class Task {
 	public String instanceName;
 	public Date dueDate;
