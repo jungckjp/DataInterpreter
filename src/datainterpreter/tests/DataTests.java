@@ -54,8 +54,7 @@ public class DataTests {
 	@Test
 	public void testTasksUpToDate()
 			throws FileNotFoundException, IOException, ParseException, java.text.ParseException {
-		assertTrue(this.di.tasksUpToDate(this.date)
-				.equals("Task changes up to Mon Feb 23 00:00:00 PST 2015 - Open: 26, Closed: 613"));
+		assertTrue(this.di.tasksUpToDate(this.date).equals("Task changes up to Mon Feb 23 00:00:00 CST 2015 - Open: 26, Closed: 613"));
 		assertTrue(this.di.tasksUpToDate(null).equals("Incorrect date format!"));
 	}
 
@@ -66,7 +65,7 @@ public class DataTests {
 		assertEquals(this.di.tasksInDateRange(null, null), "Incorect date format!");
 		assertEquals(this.di.tasksInDateRange(this.date2, this.date), "The first date must be before the second date!");
 		assertEquals(this.di.tasksInDateRange(this.date, this.date2),
-				"Task changes between Mon Feb 23 00:00:00 PST 2015 and Tue Feb 24 00:00:00 PST 2015 - Open: 37, Closed: 11");
+				"Task changes between Mon Feb 23 00:00:00 CST 2015 and Tue Feb 24 00:00:00 CST 2015 - Open: 37, Closed: 11");
 	}
 
 	@Test
